@@ -60,7 +60,7 @@ public class Slot : MonoBehaviour
     {
         if (locked) return;
 
-        MakeTurn(GameManager.player.Value, humanThisDevice: true, locked: true);
+        MakeTurn(GameManager.currentTurnOponent.Value, humanThisDevice: true, locked: true);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -68,7 +68,7 @@ public class Slot : MonoBehaviour
         if (locked) return;
 
         SetColor(mouseOverColor);
-        SetSprite(Value2Sprite(GameManager.player.Value));
+        SetSprite(Value2Sprite(GameManager.currentTurnOponent.Value));
     }
 
     public void OnPointerExit(PointerEventData eventData)

@@ -14,6 +14,39 @@ public interface Oponent
     void MakeTurn();
 }
 
+public enum OponentType
+{
+    human = 0,
+    computer = 1,
+    humanLAN = 2
+}
+
+public static class OponentFactory
+{
+    public static Oponent Create(OponentType oponentType)
+    {
+        Oponent oponent;
+        switch (oponentType)
+        {
+            case OponentType.human:
+                oponent = new Player();
+                break;
+            case OponentType.computer:
+                oponent = new ComputerOponent();
+                break;
+            case OponentType.humanLAN:
+                Debug.LogError("humanLAN not implemented");
+                oponent = null;
+                break;
+            default:
+                Debug.LogError("Unknown oponent");
+                oponent = null;
+                break;
+        }
+        return oponent;
+    }
+}
+
 public class ComputerOponent : Oponent
 {
     public string Name { get; } = "computer";

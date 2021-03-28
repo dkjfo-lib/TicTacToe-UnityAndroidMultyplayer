@@ -13,6 +13,12 @@ public class GameManager : MonoBehaviour
 
     public static Oponent player;
     public static Oponent computer;
+    public static Oponent currentTurnOponent;
+
+    public OponentType oponentType1 = OponentType.human;
+    public OponentType oponentType2 = OponentType.computer;
+
+    private Coroutine currentGame;
 
     private void Start()
     {
@@ -25,31 +31,31 @@ public class GameManager : MonoBehaviour
         while (true)
         {
             Debug.LogWarning($"Game {++gameCount} Started");
-            yield return StartCoroutine(OneGameLoop());
+            currentGame = StartCoroutine(OneGameLoop());
+            yield return currentGame;
         }
     }
 
     IEnumerator OneGameLoop()
     {
         int turnCount = 0;
-        StartNewGame();
-        Oponent oponent = player.Value > computer.Value ? player : computer;
+        StartNewGame(oponentType1, oponentType2);
+        currentTurnOponent = player.Value > computer.Value ? player : computer;
         do
         {
-            Debug.LogWarning($"{oponent.Name}'s turn, this is {++turnCount} turn of the game");
-            oponent.MakeTurn();
-            yield return new WaitWhile(() => oponent.InTurn);
-            Debug.LogWarning($"{oponent.Name} has made a turn");
-            oponent = oponent == player ? computer : player;
+            Debug.LogWarning($"{currentTurnOponent.Name}'s turn, this is {++turnCount} turn of the game");
+            currentTurnOponent.MakeTurn();
+            yield return new WaitWhile(() => currentTurnOponent.InTurn);
+            Debug.LogWarning($"{currentTurnOponent.Name} has made a turn");
+            currentTurnOponent = currentTurnOponent == player ? computer : player;
         } while (!IsGameOver());
-        StartNewGame();
     }
 
-    public void StartNewGame()
+    public void StartNewGame(OponentType type1, OponentType type2)
     {
         int rnd = UnityEngine.Random.Range(0, 2);
-        player = new Player().Create((TileValue)rnd + 1);
-        computer = new ComputerOponent().Create((TileValue)2 - rnd);
+        player = OponentFactory.Create(type1).Create((TileValue)rnd + 1);
+        computer = OponentFactory.Create(type2).Create((TileValue)2 - rnd);
         OnNewGame();
     }
 
@@ -90,6 +96,16 @@ public class GameManager : MonoBehaviour
         if (value == crossesWinValue) return TileValue.cross;
         if (value == circlesWinValue) return TileValue.circle;
         return TileValue.empty;
+    }
+
+    public void ChangeOponent1(int newType) =>
+        oponentType1 = (OponentType)newType;
+    public void ChangeOponent2(int newType) =>
+        oponentType2 = (OponentType)newType;
+    public void RestartGame()
+    {
+        StopCoroutine(currentGame);
+        StartCoroutine(MainGameLoop());
     }
 }
 
