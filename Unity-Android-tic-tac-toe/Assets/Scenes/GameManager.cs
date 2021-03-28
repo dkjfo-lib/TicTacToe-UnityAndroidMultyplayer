@@ -18,11 +18,12 @@ public class GameManager : MonoBehaviour
     public OponentType oponentType1 = OponentType.human;
     public OponentType oponentType2 = OponentType.computer;
 
+    private Coroutine currentGameLoop;
     private Coroutine currentGame;
 
     private void Start()
     {
-        StartCoroutine(MainGameLoop());
+        currentGame = StartCoroutine(MainGameLoop());
     }
 
     IEnumerator MainGameLoop()
@@ -31,8 +32,8 @@ public class GameManager : MonoBehaviour
         while (true)
         {
             Debug.LogWarning($"Game {++gameCount} Started");
-            currentGame = StartCoroutine(OneGameLoop());
-            yield return currentGame;
+            currentGameLoop = StartCoroutine(OneGameLoop());
+            yield return currentGameLoop;
         }
     }
 
@@ -104,7 +105,7 @@ public class GameManager : MonoBehaviour
         oponentType2 = (OponentType)newType;
     public void RestartGame()
     {
-        StopCoroutine(currentGame);
+        StopCoroutine(currentGameLoop);
         StartCoroutine(MainGameLoop());
     }
 }

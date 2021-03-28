@@ -103,6 +103,7 @@ public class Player : Oponent
     {
         Value = value;
         OnPlayerSlotChose += () => InTurn = false;
+        OnPlayerSlotChose += () => AudioManager.CallAudio("S slot");
         return this;
     }
 
