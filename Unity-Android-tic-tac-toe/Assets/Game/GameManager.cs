@@ -19,11 +19,10 @@ public class GameManager : MonoBehaviour
     public OponentType oponentType2 = OponentType.computer;
 
     private Coroutine currentGameLoop;
-    private Coroutine currentGame;
 
     private void Start()
     {
-        currentGame = StartCoroutine(MainGameLoop());
+        StartCoroutine(MainGameLoop());
     }
 
     IEnumerator MainGameLoop()
