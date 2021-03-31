@@ -51,4 +51,7 @@ public class GameGrid : MonoBehaviour
 
     public Slot[] GetEmptySlots() =>
         slots.Where(s => s.slotValue == TileValue.empty).ToArray();
+
+    public int GetSlotId(Slot slot) =>
+        System.Array.IndexOf(slots, slot);
 }

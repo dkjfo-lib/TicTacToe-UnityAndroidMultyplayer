@@ -8,6 +8,7 @@ public interface Oponent
 {
     string Name { get; }
     bool InTurn { get; }
+    bool IsReady { get; }
     TileValue Value { get; }
     Oponent Create(TileValue value);
 
@@ -35,8 +36,7 @@ public static class OponentFactory
                 oponent = new ComputerOponent();
                 break;
             case OponentType.humanLAN:
-                Debug.LogError("humanLAN not implemented");
-                oponent = null;
+                oponent = new OponentLAN();
                 break;
             default:
                 Debug.LogError("Unknown oponent");
@@ -51,11 +51,13 @@ public class ComputerOponent : Oponent
 {
     public string Name { get; } = "computer";
     public bool InTurn { get; private set; } = false;
+    public bool IsReady { get; private set; } = false;
     public TileValue Value { get; private set; }
 
     public Oponent Create(TileValue value)
     {
         Value = value;
+        IsReady = true;
         return this;
     }
 
@@ -97,12 +99,44 @@ public class Player : Oponent
 
     public string Name { get; } = "player";
     public bool InTurn { get; private set; }
+    public bool IsReady { get; private set; } = false;
     public TileValue Value { get; private set; }
 
     public Oponent Create(TileValue value)
     {
         Value = value;
         OnPlayerSlotChose += () => InTurn = false;
+        OnPlayerSlotChose += () => AudioManager.CallAudio("S slot");
+        IsReady = true;
+        return this;
+    }
+
+    public void MakeTurn()
+    {
+        InTurn = true;
+        // sets off on signal from button
+    }
+}
+
+[System.Serializable]
+public class OponentLAN : Oponent
+{
+    public Action OnPlayerSlotChose;
+
+    public string Name { get; } = "PlayerLAN";
+    public bool InTurn { get => inTurn; set => inTurn = value; }
+    public bool inTurn;
+    public bool IsReady => player != null;
+    public TileValue Value { get => value; private set => this.value = value; }
+    public TileValue value;
+    public PlayerLAN Player { get => this.player; set => this.player = value; }
+
+    public PlayerLAN player;
+
+    public Oponent Create(TileValue value)
+    {
+        Value = value;
+        OnPlayerSlotChose = null;
         OnPlayerSlotChose += () => AudioManager.CallAudio("S slot");
         return this;
     }

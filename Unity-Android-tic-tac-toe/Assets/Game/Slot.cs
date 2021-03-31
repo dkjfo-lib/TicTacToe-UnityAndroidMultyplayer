@@ -35,7 +35,7 @@ public class Slot : MonoBehaviour
     private void SetColor(Color newColor) =>
         displayedValue.color = newColor;
 
-    private void UpdateSprite2Value() =>
+    public void UpdateSprite2Value() =>
         SetSprite(Value2Sprite(slotValue));
 
     private Sprite Value2Sprite(TileValue value) =>
@@ -52,7 +52,15 @@ public class Slot : MonoBehaviour
 
         if (humanThisDevice)
         {
-            Player.OnPlayerSlotChose();
+            if (GameManager.instance.multiplayer)
+            {
+                Server.instance.currentTurnPlayer.player.OnPlayerSlotChose();
+                Server.instance.currentTurnPlayer.SendTurn2Server(GameGrid.instance.GetSlotId(this), Server.instance.currentTurnPlayer);
+            }
+            else
+            {
+                Player.OnPlayerSlotChose();
+            }
         }
     }
 
@@ -60,7 +68,14 @@ public class Slot : MonoBehaviour
     {
         if (locked) return;
 
-        MakeTurn(GameManager.currentTurnOponent.Value, humanThisDevice: true, locked: true);
+        if (GameManager.instance.multiplayer)
+        {
+            MakeTurn(Server.instance.currentTurnPlayer.player.Value, humanThisDevice: true, locked: true);
+        }
+        else
+        {
+            MakeTurn(GameManager.instance.currentTurnOponent.Value, humanThisDevice: true, locked: true);
+        }
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -68,7 +83,14 @@ public class Slot : MonoBehaviour
         if (locked) return;
 
         SetColor(mouseOverColor);
-        SetSprite(Value2Sprite(GameManager.currentTurnOponent.Value));
+        if (GameManager.instance.multiplayer)
+        {
+            SetSprite(Value2Sprite(Server.instance.currentTurnPlayer.player.Value));
+        }
+        else
+        {
+            SetSprite(Value2Sprite(GameManager.instance.currentTurnOponent.Value));
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
